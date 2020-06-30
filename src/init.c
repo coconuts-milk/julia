@@ -639,7 +639,10 @@ void _julia_init(JL_IMAGE_SEARCH rel)
     restore_signals();
 
     jl_page_size = jl_getpagesize();
-    uint64_t total_mem = uv_get_total_memory();
+    uint64_t constrained_mem = uv_get_constrained_memory();
+    uint64_t total_mem = constrained_mem > 0 ?
+        MIN(uv_get_total_memory(), constrained_mem) :
+        uv_get_total_memory();
     if (total_mem >= (size_t)-1) {
         total_mem = (size_t)-1;
     }
